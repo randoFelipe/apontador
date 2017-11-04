@@ -52,5 +52,5 @@ func main() {
 			total += horas
 		}
 	}
-	fmt.Printf("Você bilhetou um total de %.2f horas", total+(minutosTotal/60))
+	fmt.Printf("Você bilhetou um total de %.2f horas este mês", total+(minutosTotal/60))
 }
