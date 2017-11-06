@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func main() {
+func calculoApontamentos() (total float64) {
 	var email, user, empresa, token string
 	email = os.Getenv("EMAIL")
 	user = os.Getenv("USER")
@@ -36,7 +36,7 @@ func main() {
 	}
 	//fmt.Println(parsed["content"])
 	apontamentos := parsed["content"].([]interface{})
-	var total float64
+
 	var minutosTotal float64
 	for _, apontamento := range apontamentos {
 		mes := "11/2017"
@@ -51,6 +51,16 @@ func main() {
 			minutosTotal += minutos
 			total += horas
 		}
+		total = total + (minutosTotal / 60)
 	}
-	fmt.Printf("Você bilhetou um total de %.2f horas este mês", total+(minutosTotal/60))
+	return total
+}
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%d horas bilhetadas", calculoApontamentos())
+
+	})
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
