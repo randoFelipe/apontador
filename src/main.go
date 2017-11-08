@@ -56,11 +56,12 @@ func calculoApontamentos() (total float64) {
 	return total
 }
 
+//funcao que responde pelo index
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "%d horas bilhetadas", calculoApontamentos())
-
+		fmt.Fprintf(w, "Você bilhetou %d horas", calculoApontamentos())
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
 }
