@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-func calculoApontamentos() (total float64) {
-	var email, user, empresa, token string
+func calculoApontamentos(user string) (total float64) {
+	var email, empresa, token string
 	email = os.Getenv("EMAIL")
-	user = os.Getenv("USER")
 	empresa = os.Getenv("EMPRESA")
 	token = os.Getenv("TOKEN")
 
@@ -52,16 +53,33 @@ func calculoApontamentos() (total float64) {
 			total += horas
 		}
 		total = total + (minutosTotal / 60)
+
 	}
 	return total
 }
 
 //funcao que responde pelo index
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Você bilhetou %d horas", calculoApontamentos())
-	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", Index)
+	router.HandleFunc("/todos", TodoIndex)
+	router.HandleFunc("/usuarios/{userId}", TodoShow)
 
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func Index(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Welcome!")
+}
+
+func TodoIndex(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Todo Index!")
+}
+
+func TodoShow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	todoId := vars["userId"]
+	horasBilhetadas := strconv.FormatFloat(calculoApontamentos(todoId), 'f', 2, 64)
+	fmt.Fprintln(w, "Você bilhetou", horasBilhetadas, "horas este mês")
 }
